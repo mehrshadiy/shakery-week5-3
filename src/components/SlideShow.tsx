@@ -1,82 +1,66 @@
 // @flow
 import * as React from 'react';
-import Image from 'next/image'
-import {ReactElement, useState} from "react";
-
-const images = [
-    <Image
-        src="/img-1.jpg"
-        alt="Picture of the author"
-        fill={true}
-    />,
-    <Image
-        src="/img-2.jpeg"
-        alt="Picture of the author"
-        fill={true}
-    />,
-    <Image
-        src="/img-3.jpg"
-        alt="Picture of the author"
-        fill={true}
-    />,
-    <Image
-        src="/img-4.jpg"
-        fill={true}
-        alt="Picture of the author"
-    />,
-    <Image
-        src="/img-5.jpg"
-        fill={true}
-        alt="Picture of the author"
-    />
-]
-
-let index = 0
+import {useEffect, useState} from "react";
 
 export const SlideShow = () => {
 
-    const [imageIndex, setImageIndex] = useState(0)
 
-    const imageNext = () => {
-        if (imageIndex < images.length - 1) {
-            setImageIndex(prevState => prevState + 1)
-        } else {
-            setImageIndex(prevState => 0)
-        }
+    let openNavStyle = "absolute top-0 left-0 w-full backdrop-brightness-50 lg:static lg:backdrop-brightness-100"
+    let closeNavStyle = "hidden "
+    const [navState, setNavState] = useState(closeNavStyle)
+
+    const openNav = () => {
+      setNavState(() => openNavStyle)
     }
-    const imagePrev = () => {
-        if (!(imageIndex < 0)) {
-            setImageIndex(prevState => prevState - 1)
-        } else {
-            setImageIndex(prevState => images.length - 1)
-        }
-        return imageIndex
+    const closeNav = () => {
+      setNavState(()=> closeNavStyle)
     }
 
-    const counter = (e:boolean) => {
-        let counter = setInterval(imageNext, 1000)
-        if (!e){
-            clearInterval(counter)
+    useEffect(()=>{
+
+        const widthChecker = () => {
+            if (window.innerWidth >= 1024){
+                openNav()
+            }
         }
-    }
-    counter(true)
+        widthChecker()
+
+        window.addEventListener("resize",()=>{
+            closeNav()
+            widthChecker()
+        })
+    },[])
+
 
     return (
         <>
-            <div
-                className=" mt-28 mx-auto relative w-10/12 aspect-[4/3]">
-                <>
-                    {images[imageIndex]}
-                </>
-                <button onClick={imagePrev}
-                        className={'bg-black border-2 border-gray-500 text-2xl text-white font-bold flex justify-center items-center absolute left-2 top-1/3 p-3 aspect-square rounded-full'}>
-                    {'<'}
+            <header className={"bg-gray-700 text-white px-4 py-3 relative"}>
+                <button className={"border-2 border-white p-2 lg:hidden"}
+                onClick={openNav}>
+                    menu
                 </button>
-                <button onClick={imageNext}
-                        className={'bg-black border-2 border-gray-500 text-2xl text-white font-bold flex justify-center items-center absolute right-2 top-1/3 p-3 aspect-square rounded-full'}>
-                    {'>'}
-                </button>
-            </div>
+                <nav className={navState}
+                onClick={closeNav}>
+                    <ul className={"bg-blue-400 p-3 rounded-xl h-screen flex flex-col gap-y-4 text-xl overflow-y-scroll sm:w-10/12 lg:bg-transparent lg:w-full lg:h-fit lg:flex-row lg:justify-center lg:gap-x-3"}
+                    onClick={(event)=>event.stopPropagation()}>
+                        <li className={"lg:hidden"}>
+                            <button className={"ml-5 mb-5 bg-gray-700 border-2 border-white p-2 rounded-xl"}
+                            onClick={closeNav}>
+                                close
+                            </button>
+                        </li>
+                        <li>
+                            home
+                        </li>
+                        <li>
+                            services
+                        </li>
+                        <li>
+                            about us
+                        </li>
+                    </ul>
+                </nav>
+            </header>
         </>
     );
 };
